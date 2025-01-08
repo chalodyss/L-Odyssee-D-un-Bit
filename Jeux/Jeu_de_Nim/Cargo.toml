@@ -1,0 +1,16 @@
+# Copyright © 2025 Charles Theetten
+# Tous droits réservés.
+# Ce programme est distribué sous licence CC BY-NC-ND 4.0.
+
+[package]
+name    = "Jeu_de_Nim"
+version = "0.1.0"
+edition = "2021"
+authors = ["Charles Theetten"]
+
+[dependencies]
+rand    = "*"
+
+[[bin]]
+name    = "nim_game"
+path    = "src/nim_game.rs"
