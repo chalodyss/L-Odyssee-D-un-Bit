@@ -1,0 +1,16 @@
+/*
+ * Copyright © 2025 Charles Theetten
+ * Tous droits réservés.
+ * Ce programme est distribué sous licence CC BY-NC-ND 4.0.
+ */
+
+#home {
+    -fx-background-color: #2E4053;
+}
+
+#title {
+    -fx-font-size: 110px;
+    -fx-font-family: Verdana;
+    -fx-font-weight: Bold;
+    -fx-fill: LIME;
+}
