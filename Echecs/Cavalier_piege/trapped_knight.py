@@ -2,7 +2,7 @@
 # Tous droits réservés.
 # Ce programme est distribué sous licence CC BY-NC-ND 4.0.
 
-# pylint: disable=C0301, C0200, E0611, E1101
+# pylint: disable=C0301, C0200, E0611, E1101, R0902
 
 ################################################################################
 
@@ -76,8 +76,11 @@ class ChessBoard():
         """ init_pygame function """
         init()
 
-        self.win    = display.set_mode((1200, 1200), 0, 32)
-        self.size   = self.win.get_height() / self.dim
+        info            = display.Info()
+        screen_height   = int(info.current_h * 4 / 5)
+
+        self.win        = display.set_mode((screen_height, screen_height), 0, 32)
+        self.size       = self.win.get_height() / self.dim
 
         display.set_caption("Trapped Knight")
         display.update()
@@ -154,6 +157,7 @@ class ChessBoard():
         y = int(pos[1] // self.size)
 
         print(x, y)
+
         self.start  = np.array([y, x])
         self.coor   = self.start
         radius      = self.size / 4
@@ -202,6 +206,8 @@ class ChessBoard():
 
     def draw_board(self):
         """ draw_board function """
+        self.win.fill((0, 0, 0))
+
         for i in range(0, self.dim):
             for j in range(0, self.dim):
                 if (i + j) & 1 == 0:
