@@ -9,7 +9,6 @@
 ################################################################################
 
 import  argparse
-import  sys
 
 from    turtle import Turtle
 
@@ -51,33 +50,41 @@ def build(p_a, p_b, p_c, iterations):
 
 ################################################################################
 
+def check_iterations(value):
+    """ check_iterations function """
+    iteratations = int(value)
+
+    if iteratations < 0 or iteratations > 7:
+        raise argparse.ArgumentTypeError(f"ITERATIONS must be between 0 and 7, got {iteratations}.")
+
+    return iteratations
+
+def check_speed(value):
+    """ check_speed function """
+    speed = int(value)
+
+    if speed < 0 or speed > 10:
+        raise argparse.ArgumentTypeError(f"SPEED must be between 0 and 10, got {speed}.")
+
+    return speed
+
 def check_args():
     """ check_args function """
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("ITERATIONS", help = "values in {0... 7}.", type = int)
-    parser.add_argument("DELAY",  help = "values in {0, 10}.", type = int)
+    parser.add_argument("ITERATIONS", help = "Values between 0 and 7.", type = check_iterations)
+    parser.add_argument("SPEED",  help = "Values between 0 and 10.", type = check_speed)
 
-    args = parser.parse_args()
-
-    try:
-        if args.ITERATIONS not in range(0, 8):
-            raise argparse.ArgumentTypeError(f"ITERATIONS : {args.ITERATIONS} is an invalid value.")
-        if args.DELAY not in range(0, 11):
-            raise argparse.ArgumentTypeError(f"DELAY : {args.DELAY} is an invalid value.")
-    except argparse.ArgumentTypeError as e:
-        print(f"Argument Error - {e}\n")
-        parser.print_help()
-        sys.exit(-1)
+    return parser.parse_args()
 
 ################################################################################
 
 def main():
     """ main function """
-    check_args()
+    args            = check_args()
 
-    iterations      = int(sys.argv[1])
-    speed           = int(sys.argv[2])
+    iterations      = args.ITERATIONS
+    speed           = args.SPEED
 
     turtle          = Turtle()
     ws              = turtle.getscreen()
