@@ -21,12 +21,24 @@ application {
     mainModule  = "pong"
 }
 
-javafx {
-    modules("javafx.graphics", "javafx.controls", "javafx.fxml", "javafx.media")
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
 }
 
-tasks.withType<Jar> {
+javafx {
+    version = "21"
+    modules("javafx.graphics", "javafx.controls", "javafx.fxml")
+}
+
+tasks.named<Delete>("clean") {
+    delete("target")
+}
+
+tasks.named<Jar>("jar") {
     archiveBaseName = "Pong"
+    destinationDirectory.set(file("target"))
 
     manifest {
         attributes["Main-Class"] = "abitodyssey.pong.Main"
