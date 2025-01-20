@@ -30,17 +30,17 @@ import static java.lang.Math.*;
 
 class Game {
 
-    static IntegerProperty score    = new SimpleIntegerProperty(0);
-
-    static Rectangle    player      = new Rectangle(30, 150, Color.WHITE);
-    static Rectangle    cpu         = new Rectangle(30, 150, Color.WHITE);
-    static Circle       ball        = new Circle(450, 350, 15, Color.WHITE);
-
-    static double       vel         = 0;
-    static double       angle       = atan2(1.0, 5.0);
-    static double       mag         = sqrt(26);
-    static double       dX          = mag * cos(angle);
-    static double       dY          = mag * sin(angle);
+    static IntegerProperty score  = new SimpleIntegerProperty(0);
+    //
+    static Rectangle       player = new Rectangle(30, 150, Color.WHITE);
+    static Rectangle       cpu    = new Rectangle(30, 150, Color.WHITE);
+    static Circle          ball   = new Circle(450, 350, 15, Color.WHITE);
+    //
+    static double          vel    = 0;
+    static double          angle  = atan2(1.0, 5.0);
+    static double          mag    = sqrt(26);
+    static double          dX     = mag * cos(angle);
+    static double          dY     = mag * sin(angle);
 
     static {
         player.setX(0);
@@ -71,18 +71,21 @@ class Game {
     }
 
     static void updateBall() {
-        ball.setCenterX(ball.getCenterX() + dX);
-        ball.setCenterY(ball.getCenterY() + dY);
+        var newX = ball.getCenterX() + dX;
+        var newY = ball.getCenterY() + dY;
 
-        if (ball.getCenterY() > 735 || ball.getCenterY() < 15) dY = -dY;
+        ball.setCenterX(newX);
+        ball.setCenterY(newY);
+
+        if (newY > 735 || newY < 15) dY = -dY;
 
         if (player.getBoundsInParent().intersects(ball.getBoundsInParent())) {
             mag     *= (mag < 25) ? 1.1 : 1;
-            angle   = abs((PI / 4.0) * (player.getY() + 75 - ball.getCenterY() - 15) / 75);
-            dX      = mag * cos(angle);
-            dY      = dY < 0 ? -mag * sin(angle) : mag * sin(angle);
+            angle   = Math.abs((Math.PI / 4.0) * (player.getY() + 75 - newY - 15) / 75);
+            dX      = mag * Math.cos(angle);
+            dY      = dY < 0 ? -mag * Math.sin(angle) : mag * Math.sin(angle);
             score.set(score.get() + 1);
-        } else if (ball.getCenterX() > 1150 && cpu.getBoundsInParent().intersects(ball.getBoundsInParent())) {
+        } else if (newX > 1150 && cpu.getBoundsInParent().intersects(ball.getBoundsInParent())) {
             dX = -dX;
         }
     }
@@ -158,14 +161,14 @@ public class Main extends Application {
 
     public void start(Stage stage) {
         try {
-            Controller controller = new Controller();
+            FXMLLoader loader       = new FXMLLoader(getClass().getResource("/views/View.fxml"));
+            Controller controller   = new Controller();
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/View.fxml"));
             loader.setController(controller);
 
-            BorderPane root = loader.load();
+            BorderPane root         = loader.load();
+            Scene      scene        = new Scene(root);
 
-            Scene scene = new Scene(root);
             scene.setOnKeyPressed(controller::move);
             scene.setOnKeyReleased(controller::halt);
 
