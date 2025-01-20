@@ -17,5 +17,5 @@ gradle build
 ### Run
 
 <pre>
-gradle run --args="src/main/resources/dico.txt" --console=plain
+gradle run --args="dico.txt" --console=plain
 </pre>
