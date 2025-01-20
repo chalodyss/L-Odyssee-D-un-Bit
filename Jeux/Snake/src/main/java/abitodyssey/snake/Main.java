@@ -9,6 +9,7 @@ package abitodyssey.snake;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -28,10 +29,10 @@ import java.util.Random;
 
 class Game {
 
-    static IntegerProperty score = new SimpleIntegerProperty(0);
-
-    static Random          rand  = new Random();
-    static Rectangle       food  = new Rectangle(100, 200, 20, 20);
+    static IntegerProperty score;
+    //
+    static Random          rand;
+    static Rectangle       food;
     static Rectangle[]     snake;
     static int             length;
     static char            direction;
@@ -44,6 +45,10 @@ class Game {
     private Game() {}
 
     static void reset() {
+        score     = new SimpleIntegerProperty(0);
+        rand      = new Random();
+        food      = new Rectangle(100, 200, 20, 20);
+        snake     = new Rectangle[256];
         length    = 1;
         direction = 'W';
 
@@ -52,8 +57,9 @@ class Game {
         food.setX(100);
         food.setY(200);
 
-        snake = new Rectangle[256];
+        snake    = new Rectangle[256];
         snake[0] = new Rectangle(20, 20, Color.BLACK);
+
         snake[0].setX(300);
         snake[0].setY(200);
     }
@@ -132,7 +138,7 @@ class Game {
 
 class Renderer {
 
-    private Renderer() { }
+    private Renderer() {}
 
     static void clean(Pane board) {
         board.getChildren().clear();
@@ -203,10 +209,10 @@ class Controller {
 
     void move(KeyEvent e) {
         switch (e.getCode()) {
-            case UP    -> Game.direction = 'N';
-            case RIGHT -> Game.direction = 'E';
-            case LEFT  -> Game.direction = 'W';
-            case DOWN  -> Game.direction = 'S';
+            case UP     -> Game.direction = 'N';
+            case RIGHT  -> Game.direction = 'E';
+            case LEFT   -> Game.direction = 'W';
+            case DOWN   -> Game.direction = 'S';
         }
     }
 
@@ -216,14 +222,14 @@ public class Main extends Application {
 
     public void start(Stage stage) {
         try {
-            Controller controller = new Controller();
+            FXMLLoader loader       = new FXMLLoader(getClass().getResource("/views/View.fxml"));
+            Controller controller   = new Controller();
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/View.fxml"));
             loader.setController(controller);
 
-            BorderPane root = loader.load();
+            BorderPane root         = loader.load();
+            Scene      scene        = new Scene(root);
 
-            Scene scene = new Scene(root);
             scene.setOnKeyPressed(controller::move);
 
             stage.setResizable(false);
@@ -231,7 +237,7 @@ public class Main extends Application {
             stage.setScene(scene);
             stage.show();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            Platform.exit();
             System.exit(-1);
         }
     }
