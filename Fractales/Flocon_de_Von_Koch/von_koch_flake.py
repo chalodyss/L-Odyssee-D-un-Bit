@@ -2,7 +2,7 @@
 # Tous droits réservés.
 # Ce programme est distribué sous licence CC BY-NC-ND 4.0.
 
-# pylint: disable=E1101
+# pylint: disable=E1101, R0914
 
 ################################################################################
 
@@ -12,7 +12,6 @@
 
 import  argparse
 import  math
-import  sys
 import  turtle
 
 ################################################################################
@@ -98,27 +97,42 @@ def koch_curve(start, end, iterations):
 
 ################################################################################
 
+def check_iterations(value):
+    """ check_iterations function """
+    iterations = int(value)
+
+    if iterations < 0 or iterations > 6:
+        raise argparse.ArgumentTypeError(f"ITERATIONS must be between 0 and 6, got {iterations}.")
+
+    return iterations
+
+def check_speed(value):
+    """ check_speed function """
+    speed = int(value)
+
+    if speed < 0 or speed > 10:
+        raise argparse.ArgumentTypeError(f"SPEED must be between 0 and 10, got {speed}.")
+
+    return speed
+
+def check_tracer(value):
+    """ check_tracer function """
+    tracer = int(value)
+
+    if tracer not in range(0, 2):
+        raise argparse.ArgumentTypeError(f"TRACER must be 0 or 1, got {tracer}.")
+
+    return tracer
+
 def check_args():
     """ check_args function """
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("ITERATIONS", help = "values in {0... 6}.", type = int)
-    parser.add_argument("DELAY",  help = "values in {0... 10}.", type = int)
-    parser.add_argument("TRACER",  help = "values in {0, 1}.", type = int)
+    parser.add_argument("ITERATIONS", help = "Values between 0 and 6.", type = check_iterations)
+    parser.add_argument("SPEED",  help = "Values between 0 and 10.", type = check_speed)
+    parser.add_argument("TRACER",  help = "Values in {0, 1}.", type = check_tracer)
 
-    args = parser.parse_args()
-
-    try:
-        if args.ITERATIONS not in range(0, 8):
-            raise argparse.ArgumentTypeError(f"ITERATIONS : {args.ITERATIONS} is an invalid value.")
-        if args.DELAY not in range(0, 11):
-            raise argparse.ArgumentTypeError(f"DELAY : {args.DELAY} is an invalid value.")
-        if args.TRACER not in range(0, 2):
-            raise argparse.ArgumentTypeError(f"TRACER : {args.TRACER} is an invalid value.")
-    except argparse.ArgumentTypeError as e:
-        print(f"Argument Error - {e}\n")
-        parser.print_help()
-        sys.exit(-1)
+    return parser.parse_args()
 
 ################################################################################
 
@@ -126,9 +140,11 @@ def main():
     """ main function """
     check_args()
 
-    iterations      = int(sys.argv[1])
-    speed           = int(sys.argv[2])
-    tracer          = int(sys.argv[3])
+    args            = check_args()
+
+    iterations      = args.ITERATIONS
+    speed           = args.SPEED
+    tracer          = args.TRACER
 
     ws              = turtle.getscreen()
 
