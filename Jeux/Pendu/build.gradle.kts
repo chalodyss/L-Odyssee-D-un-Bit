@@ -20,14 +20,25 @@ application {
     mainModule  = "pendu"
 }
 
-tasks.named<JavaExec>("run") {
-    standardInput = System.`in`
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
 }
 
-tasks.withType<Jar> {
+tasks.named<Delete>("clean") {
+    delete("target")
+}
+
+tasks.named<Jar>("jar") {
     archiveBaseName = "Pendu"
+    destinationDirectory.set(file("target"))
 
     manifest {
         attributes["Main-Class"] = "abitodyssey.pendu.Main"
     }
+}
+
+tasks.named<JavaExec>("run") {
+    standardInput = System.`in`
 }
