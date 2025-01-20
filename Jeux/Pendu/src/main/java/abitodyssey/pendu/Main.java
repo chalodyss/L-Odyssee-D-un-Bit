@@ -19,9 +19,28 @@ import static abitodyssey.pendu.Constants.MAN;
 
 class Main {
 
-    static Scanner sc   = new Scanner(System.in);
-    static String  word = "";
+    static final String  LIME  = "\u001B[92m";
+    static final String  RESET = "\u001B[0m";
+    //
+    static       Scanner sc    = new Scanner(System.in);
+    static       String  word  = "";
 
+
+    static char checkInput() {
+        while (true) {
+            System.out.println("Choose a letter:");
+
+            var input = sc.next();
+
+            if (input.length() == 1) {
+                var c = input.charAt(0);
+
+                if (c >= 'a' && c <= 'z') return c;
+            }
+
+            System.out.println(LIME + "Please enter a lowercase letter." + RESET);
+        }
+    }
 
     static String buildWord(String str, char c) {
         var sb = new StringBuilder(str);
@@ -43,8 +62,7 @@ class Main {
         System.out.println("\n");
 
         while (trials < 7 && !str.equals(word)) {
-            System.out.println("Choose a letter:");
-            var c = sc.next().charAt(0);
+            var c = checkInput();
             if (word.contains(Character.toString(c))) str = buildWord(str, c);
             else System.out.println(MAN[trials++] + "\n");
             str.chars().forEach(letter -> System.out.print((char) letter + " "));
