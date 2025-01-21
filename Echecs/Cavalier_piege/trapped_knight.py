@@ -11,7 +11,7 @@
 ################################################################################
 
 import  argparse
-import  sys
+import  threading
 import  numpy       as np
 import  pygame
 
@@ -42,16 +42,18 @@ class ChessBoard():
 
     def __init__(self, dim, origin, delay):
         """ init function """
-        self.dim    = dim
-        self.origin = origin
-        self.delay  = delay
-        self.start  = None
-        self.coor   = None
-        self.win    = None
-        self.board  = None
-        self.size   = 0
-        self.init   = False
-        self.path   = []
+        self.dim            = dim
+        self.origin         = origin
+        self.delay          = delay
+        self.start          = None
+        self.path_thread    = None
+        self.quit_event     = None
+        self.coor           = None
+        self.win            = None
+        self.board          = None
+        self.size           = 0
+        self.init           = False
+        self.path           = []
 
         self.init_pygame()
         self.reset()
@@ -60,8 +62,9 @@ class ChessBoard():
 
     def reset(self):
         """ reset function """
-        self.init   = True
-        self.path   = []
+        self.init       = False
+        self.path       = []
+        self.quit_event = threading.Event()
 
         if self.origin == 0:
             self.init_board_diag()
@@ -224,6 +227,9 @@ class ChessBoard():
     def draw_path(self):
         """ draw_path function """
         for i in range(2, len(self.coor), 2):
+            if self.quit_event.is_set():
+                break
+
             y1 = self.coor[i - 2] * self.size + self.size / 2
             x1 = self.coor[i - 1] * self.size + self.size / 2
             y2 = self.coor[i] * self.size + self.size / 2
@@ -242,9 +248,11 @@ class ChessBoard():
     def solve(self):
         """ solve function """
         if self.init is True:
+            self.init           = False
+            self.path_thread    = threading.Thread(target = self.draw_path)
+
             self.trapped_knight()
-            self.draw_path()
-            self.init = False
+            self.path_thread.start()
 
     ############################################################################
 
@@ -256,8 +264,13 @@ class ChessBoard():
             for event in pygame.event.get():
                 if event.type == QUIT:
                     running = False
+                    self.quit_event.set()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
+                        if self.path_thread and self.path_thread.is_alive():
+                            self.quit_event.set()
+                            self.path_thread.join()
+                            self.quit_event.clear()
                         self.reset()
                         self.init_start(pygame.mouse.get_pos())
                     if event.button == 3:
@@ -265,39 +278,54 @@ class ChessBoard():
 
 ################################################################################
 
+def check_dimension(value):
+    """ check_dimension function """
+    dimension = int(value)
+
+    if dimension < 4 or dimension > 100:
+        raise argparse.ArgumentTypeError(f"Dimension must be between 4 and 100, got {dimension}.")
+
+    return dimension
+
+def check_origin(value):
+    """ check_origin function """
+    origin = int(value)
+
+    if origin not in [0, 1]:
+        raise argparse.ArgumentTypeError(f"Origin must be 0 or 1, got {origin}.")
+
+    return origin
+
+def check_delay(value):
+    """ check_delay function """
+    delay = int(value)
+
+    if delay < 1 or delay > 1000:
+        raise argparse.ArgumentTypeError(f"Delay must be between 1 and 1000, got {delay}.")
+
+    return delay
+
 def check_args():
     """ check_args function """
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("DIMENSION", help = "values in {4... 100}.", type = int)
-    parser.add_argument("ORIGIN",  help = "values in {0, 1}.", type = int)
-    parser.add_argument("DELAY",  help = "values in {1... 1000}.", type = float)
+    parser.add_argument("DIMENSION", help = "Values between 4 and 100.", type = check_dimension)
+    parser.add_argument("ORIGIN",  help = "Values between in {0, 1}.", type = check_origin)
+    parser.add_argument("DELAY",  help = "Values between 1 and 1000.", type = check_delay)
 
-    args = parser.parse_args()
-
-    try:
-        if args.DIMENSION not in range(4, 101):
-            raise argparse.ArgumentTypeError(f"DIMENSION : {args.DIMENSION} is an invalid value.")
-        if args.ORIGIN not in [0, 1]:
-            raise argparse.ArgumentTypeError(f"ORIGIN : {args.ORIGIN} is an invalid value.")
-        if args.DELAY not in range(1, 1001):
-            raise argparse.ArgumentTypeError(f"DELAY : {args.DELAY} is an invalid value.")
-    except argparse.ArgumentTypeError as e:
-        print(f"Argument Error - {e}\n")
-        parser.print_help()
-        sys.exit(-1)
+    return parser.parse_args()
 
 ################################################################################
 
 def main():
     """ main function"""
-    check_args()
+    args        = check_args()
 
-    dim     = int(sys.argv[1])
-    origin  = int(sys.argv[2])
-    delay   = int(sys.argv[3])
+    dim         = args.DIMENSION
+    origin      = args.ORIGIN
+    delay       = args.DELAY
 
-    chessboard = ChessBoard(dim, origin, delay)
+    chessboard  = ChessBoard(dim, origin, delay)
     chessboard.run()
 
     pygame.quit()
