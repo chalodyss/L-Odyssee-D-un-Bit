@@ -5,7 +5,6 @@
  */
 
 module hanoitowers {
-    requires transitive javafx.graphics;
     requires javafx.controls;
     requires javafx.fxml;
 
