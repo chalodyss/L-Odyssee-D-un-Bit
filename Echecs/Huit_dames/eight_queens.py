@@ -2,6 +2,8 @@
 # Tous droits réservés.
 # Ce programme est distribué sous licence CC BY-NC-ND 4.0.
 
+# pylint: disable=C0411, W0613
+
 ################################################################################
 
 """ Eight Queens """
@@ -9,8 +11,6 @@
 ################################################################################
 
 import  argparse
-import  sys
-import  time
 import  numpy   as np
 
 from    numba   import njit
@@ -41,8 +41,9 @@ def eight_queens(board, delay):
             queen = (row, col)
             if is_well_placed(queen, solutions):
                 solutions.append(queen)
-                #time.sleep(delay)
-                #print_chessboard(dim, solutions)
+                #if delay != -1:
+                #    time.sleep(delay)
+                #    print_chessboard(dim, solutions)
                 break
             row += 1
 
@@ -112,33 +113,41 @@ def print_chessboard(dim, solutions):
 
 ################################################################################
 
+def check_dimension(value):
+    """ check_dimension function """
+    dimension = int(value)
+
+    if dimension < 0 or dimension > 64:
+        raise argparse.ArgumentTypeError(f"DIMENSION must be between 0 and 64, got {dimension}.")
+
+    return dimension
+
+def check_delay(value):
+    """ check_delay function """
+    delay = int(value)
+
+    if delay not in [0, 1] and delay != -1:
+        raise argparse.ArgumentTypeError(f"DELAY must be 0, 1 or -1, got {delay}.")
+
+    return delay
+
 def check_args():
     """ check_args function """
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("DIMENSIONS", help = "values in {0... 64}.", type = int)
-    parser.add_argument("DELAY",  help = "values in {0... 1}.", type = float)
+    parser.add_argument("DIMENSION", help = "Values between 0 and 64.", type = check_dimension)
+    parser.add_argument("DELAY",  help = "Values between 0 and 1 or -1.", type = check_delay)
 
-    args = parser.parse_args()
-
-    try:
-        if args.DIMENSIONS not in range(0, 65):
-            raise argparse.ArgumentTypeError(f"DIMENSIONS : {args.DIMENSIONS} is an invalid value.")
-        if args.DELAY not in np.arange(0, 10, 0.001):
-            raise argparse.ArgumentTypeError(f"DELAY : {args.DELAY} is an invalid value.")
-    except argparse.ArgumentTypeError as e:
-        print(f"Argument Error - {e}\n")
-        parser.print_help()
-        sys.exit(-1)
+    return parser.parse_args()
 
 ################################################################################
 
 def main():
     """ main function """
-    check_args()
+    args        = check_args()
 
-    dim         = int(sys.argv[1])
-    delay       = float(sys.argv[2])
+    dim         = args.DIMENSION
+    delay       = args.DELAY
 
     t_start     = perf_counter()
     chessboard  = np.zeros((dim, dim), dtype = np.uint8)
