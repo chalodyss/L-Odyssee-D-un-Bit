@@ -9,6 +9,7 @@ package abitodyssey.tetris;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -102,7 +103,7 @@ class Tetromino {
 
 class Collisions {
 
-    private Collisions() { }
+    private Collisions() {}
 
     static boolean isNotBottomCollided(Tetromino tetro, int[][] board) {
         return tetro.squares.stream().allMatch(s -> s.y < 23 && board[s.y + 1][s.x] == 0);
@@ -125,7 +126,7 @@ class Collisions {
 
         copy.rotate();
 
-        for (Square s: copy.squares) {
+        for (Square s : copy.squares) {
             if (s.x < 0 || s.x > 9 || s.y < 0 || s.y > 23)  return false;
             if (board[s.y][s.x] == 1)                       return false;
         }
@@ -137,32 +138,38 @@ class Collisions {
 
 class Game {
 
-    static BooleanProperty  end         = new SimpleBooleanProperty(false);
-    static IntegerProperty  level       = new SimpleIntegerProperty(1);
-    static IntegerProperty  score       = new SimpleIntegerProperty(0);
-    static LongProperty     time        = new SimpleLongProperty(1_000_000_000L);
+    static BooleanProperty end;
+    static IntegerProperty level;
+    static IntegerProperty score;
+    static LongProperty    time;
 
-    static Random           rand        = new Random();
-    static int              scoreLimit  = 400;
-    static int[][]          grid        = new int[24][10];
-    static List<Tetromino>  tetrominos  = new ArrayList<>();
-    static Tetromino        curTetro    = new Tetromino(TETROMINOS.get(rand.nextInt(7)));
-    static int              nbRows      = 0;
+    static Random          rand;
+    static int             scoreLimit;
+    static int[][]         grid;
+    static List<Tetromino> tetrominos;
+    static Tetromino       curTetro;
+    static int             nbRows;
+
+    static {
+        reset();
+    }
 
 
-    private Game() { }
+    private Game() {}
 
     static void reset() {
-        curTetro   = new Tetromino(TETROMINOS.get(rand.nextInt(7)));
+        end        = new SimpleBooleanProperty(false);
+        level      = new SimpleIntegerProperty(1);
+        score      = new SimpleIntegerProperty(0);
+        time       = new SimpleLongProperty(1_000_000_000L);
+        rand       = new Random();
         scoreLimit = 400;
+        grid       = new int[24][10];
+        tetrominos = new ArrayList<>();
+        curTetro   = new Tetromino(TETROMINOS.get(rand.nextInt(7)));
+        nbRows     = 0;
 
-        end.set(false);
-        level.set(1);
-        score.set(0);
-        time.set(1_000_000_000L);
-        tetrominos.clear();
         tetrominos.add(curTetro);
-        resetGrid();
     }
 
     static void update() {
@@ -226,13 +233,13 @@ class Game {
 
 class Renderer {
 
-    private Renderer() { }
+    private Renderer() {}
 
     static void render(GraphicsContext gc, List<Tetromino> tetrominos) {
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, 350, 700);
         gc.setStroke(Color.WHITE);
-        IntStream.range(1, 10).forEach(i -> gc.strokeLine(i * 350.0 / 10, 0, i *  350.0 / 10, 700));
+        IntStream.range(1, 10).forEach(i -> gc.strokeLine(i * 350.0 / 10, 0, i * 350.0 / 10, 700));
         IntStream.range(1, 10 * 2).forEach(j -> gc.strokeLine(0, j * 0.5 * 700.0 / 10, 350, j * 0.5 * 700.0 / 10));
 
         tetrominos.forEach(t -> {
@@ -305,14 +312,14 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            Controller controller = new Controller();
+            FXMLLoader loader       = new FXMLLoader(getClass().getResource("/views/View.fxml"));
+            Controller controller   = new Controller();
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/View.fxml"));
             loader.setController(controller);
 
-            BorderPane root = loader.load();
+            BorderPane root         = loader.load();
+            Scene      scene        = new Scene(root);
 
-            Scene scene = new Scene(root);
             scene.setOnKeyPressed(controller::move);
 
             primaryStage.setTitle("Tetris");
@@ -320,7 +327,8 @@ public class Main extends Application {
             primaryStage.setScene(scene);
             primaryStage.show();
         } catch (Exception e) {
-            e.printStackTrace();
+            Platform.exit();
+            System.exit(-1);
         }
     }
 
