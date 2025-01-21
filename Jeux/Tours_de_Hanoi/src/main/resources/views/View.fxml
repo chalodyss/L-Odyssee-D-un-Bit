@@ -15,32 +15,28 @@ Ce programme est distribué sous licence CC BY-NC-ND 4.0.
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1200.0" prefWidth="1800.0" stylesheets="@View.css" xmlns="http://javafx.com/javafx/" xmlns:fx="http://javafx.com/fxml/">
-   <children>
-      <GridPane fx:id="header" prefHeight="50.0">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0"
+      prefWidth="1200.0" stylesheets="@View.css" xmlns="http://javafx.com/javafx/" xmlns:fx="http://javafx.com/fxml/">
+    <GridPane fx:id="header" prefHeight="50.0">
         <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
         </rowConstraints>
-         <children>
-            <Button mnemonicParsing="false" onAction="#solve" prefWidth="200.0" text="SOLVE" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
-            <ComboBox fx:id="disks" onAction="#reset" prefWidth="200.0" GridPane.halignment="CENTER" />
-         </children>
-      </GridPane>
-      <Pane fx:id="board" prefHeight="1150.0" prefWidth="1200.0">
-         <children>
-            <Line endX="450.0" endY="1150.0" startX="450.0" startY="200.0" stroke="#bdc3c7" strokeWidth="11.0" />
-            <Line endX="900.0" endY="1150.0" startX="900.0" startY="200.0" stroke="#bdc3c7" strokeWidth="11.0" />
-            <Line endX="1350.0" endY="1150.0" startX="1350.0" startY="200.0" stroke="#bdc3c7" strokeWidth="11.0" />
-            <Text fx:id="nbMoves" fill="#0dff00" strokeType="OUTSIDE" strokeWidth="0.0" text="-------" x="50.0" y="75.0">
-               <font>
-                  <Font name="System Bold" size="48.0" />
-               </font>
-            </Text>
-         </children>
-      </Pane>
-   </children>
+        <Button mnemonicParsing="false" onAction="#solve" prefWidth="200.0" text="SOLVE" GridPane.columnIndex="1"
+                GridPane.halignment="CENTER"/>
+        <ComboBox fx:id="disks" onAction="#reset" prefWidth="200.0" GridPane.halignment="CENTER"/>
+    </GridPane>
+    <Pane fx:id="board" prefHeight="750.0" prefWidth="1200.0">
+        <Line endX="300.0" endY="750.0" startX="300.0" startY="200.0" stroke="#bdc3c7" strokeWidth="11.0"/>
+        <Line endX="600.0" endY="750.0" startX="600.0" startY="200.0" stroke="#bdc3c7" strokeWidth="11.0"/>
+        <Line endX="900.0" endY="750.0" startX="900.0" startY="200.0" stroke="#bdc3c7" strokeWidth="11.0"/>
+        <Text fx:id="nbMoves" fill="#0dff00" strokeType="OUTSIDE" strokeWidth="0.0" text="-------" x="50.0" y="75.0">
+            <font>
+                <Font name="System Bold" size="48.0"/>
+            </font>
+        </Text>
+    </Pane>
 </VBox>
