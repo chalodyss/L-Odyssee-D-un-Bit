@@ -21,7 +21,14 @@ application {
     mainModule  = "morpion"
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
 javafx {
+    version = "21"
     modules("javafx.graphics", "javafx.controls", "javafx.fxml")
 }
 
@@ -31,8 +38,13 @@ sourceSets {
     }
 }
 
-tasks.withType<Jar> {
+tasks.named<Delete>("clean") {
+    delete("target")
+}
+
+tasks.named<Jar>("jar") {
     archiveBaseName = "Morpion"
+    destinationDirectory.set(file("target"))
 
     manifest {
         attributes["Main-Class"] = "abitodyssey.morpion.Main"
