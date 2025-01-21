@@ -38,6 +38,7 @@ tasks.named<Delete>("clean") {
 
 tasks.named<Jar>("jar") {
     archiveBaseName = "Tetris"
+    destinationDirectory.set(file("target"))
 
     manifest {
         attributes["Main-Class"] = "abitodyssey.tetris.Main"
