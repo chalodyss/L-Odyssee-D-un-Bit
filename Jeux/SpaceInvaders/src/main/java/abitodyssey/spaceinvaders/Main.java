@@ -106,7 +106,7 @@ class Player extends Entity {
 
 class Collisions {
 
-    private Collisions() { }
+    private Collisions() {}
 
     static boolean collide(Entity e1, Entity e2) {
         return e1.getBoundsInParent().intersects(e2.getBoundsInParent());
@@ -129,6 +129,7 @@ class Collisions {
                 w.state = DEAD;
                 return true;
             }
+            
             return false;
         });
     }
@@ -173,29 +174,29 @@ class Collisions {
 
 class Game {
 
-    static BooleanProperty end       = new SimpleBooleanProperty(false);
-    static IntegerProperty score     = new SimpleIntegerProperty(0);
-
-    static Random          rand      = new Random();
-    static int             direction = 0;
-    static double          deltaX    = 1;
-
+    static BooleanProperty end;
+    static IntegerProperty score;
+    //
+    static Random          rand;
+    static int             direction;
+    static double          deltaX;
+    //
     static Player          player;
     static List<Entity>    invaders;
     static List<Entity>    walls;
     static List<Entity>    beams;
 
     static {
-        setPlayer();
-        setInvaders();
-        setWalls();
-        setBeams();
+        reset();
     }
 
 
-    private Game() { }
+    private Game() {}
 
     static void reset() {
+        end       = new SimpleBooleanProperty(false);
+        score     = new SimpleIntegerProperty(0);
+        rand      = new Random();
         direction = 0;
         deltaX    = 1;
 
@@ -303,6 +304,7 @@ class Game {
             if (i <= 12)        invaders.add(new Entity(x, y, SQUID));
             else if (i <= 36)   invaders.add(new Entity(x, y, CRAB));
             else                invaders.add(new Entity(x, y, OCTOPUS));
+
             x = (i % 12 == 0) ? 60 : x + 60;
             y = (i % 12 == 0) ? y + 60 : y;
         }
@@ -321,6 +323,7 @@ class Game {
                 walls.add(new Entity(x, y, WALL));
                 x += 40;
             }
+
             x = 100;
             y += 30 - 1;
         }
@@ -330,7 +333,7 @@ class Game {
 
 class Renderer {
 
-    private Renderer() { }
+    private Renderer() {}
 
     static void renderBeams(Pane board) {
         for (var e : Game.beams) {
@@ -400,18 +403,18 @@ class Controller {
     void inputs() {
         for (var code : activeKeys) {
             switch (code) {
-                case LEFT  -> Game.player.velX = -10;
-                case RIGHT -> Game.player.velX = 10;
-                case SPACE -> Game.player.shoot();
+                case LEFT   -> Game.player.velX = -10;
+                case RIGHT  -> Game.player.velX = 10;
+                case SPACE  -> Game.player.shoot();
             }
         }
     }
 
     void move(KeyEvent e) {
         switch (e.getCode()) {
-            case LEFT  -> { if (!activeKeys.contains(KeyCode.RIGHT)) activeKeys.add(e.getCode()); }
-            case RIGHT -> { if (!activeKeys.contains(KeyCode.LEFT))  activeKeys.add(e.getCode()); }
-            case SPACE -> activeKeys.add(e.getCode());
+            case LEFT   -> { if (!activeKeys.contains(KeyCode.RIGHT)) activeKeys.add(e.getCode()); }
+            case RIGHT  -> { if (!activeKeys.contains(KeyCode.LEFT)) activeKeys.add(e.getCode()); }
+            case SPACE  -> activeKeys.add(e.getCode());
         }
     }
 
@@ -453,14 +456,14 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            Controller controller = new Controller();
+            FXMLLoader loader       = new FXMLLoader(getClass().getResource("/views/View.fxml"));
+            Controller controller   = new Controller();
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/View.fxml"));
             loader.setController(controller);
 
-            VBox root = loader.load();
+            VBox  root              = loader.load();
+            Scene scene             = new Scene(root);
 
-            Scene scene = new Scene(root);
             scene.setOnKeyPressed(controller::move);
             scene.setOnKeyReleased(controller::halt);
 
