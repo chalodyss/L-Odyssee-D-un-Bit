@@ -5,7 +5,6 @@
  */
 
 module tetris {
-    requires transitive javafx.graphics;
     requires javafx.controls;
     requires javafx.fxml;
 
