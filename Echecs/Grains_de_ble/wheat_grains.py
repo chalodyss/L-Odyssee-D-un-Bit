@@ -9,7 +9,6 @@
 ################################################################################
 
 import argparse
-import sys
 
 ################################################################################
 
@@ -30,33 +29,41 @@ def wheat_grains(nb_cases, verbose = 0):
 
 ################################################################################
 
+def check_nbcases(value):
+    """ check_nbcases function """
+    nb_cases = int(value)
+
+    if nb_cases < 0 or nb_cases > 64:
+        raise argparse.ArgumentTypeError(f"NB_CASES must be between 0 and 64, got {nb_cases}.")
+
+    return nb_cases
+
+def check_verbose(value):
+    """ check_verbose function """
+    verbose = int(value)
+
+    if verbose not in [0, 1]:
+        raise argparse.ArgumentTypeError(f"VERBOSE must be 0 or 1, got {verbose}.")
+
+    return verbose
+
 def check_args():
     """ check_args function """
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("NB_CASES", help = "values in {0... 64}.", type = int)
-    parser.add_argument("VERBOSE",  help = "values in {0, 1}.", type = int)
+    parser.add_argument("NB_CASES", help = "Values between 0 and 64.", type = check_nbcases)
+    parser.add_argument("VERBOSE",  help = "Values between in {0, 1}.", type = check_verbose)
 
-    args = parser.parse_args()
-
-    try:
-        if args.NB_CASES not in range(0, 65):
-            raise argparse.ArgumentTypeError(f"NB_CASES : {args.NB_CASES} is an invalid value.")
-        if args.VERBOSE not in [0, 1]:
-            raise argparse.ArgumentTypeError(f"VERBOSE : {args.VERBOSE} is an invalid value.")
-    except argparse.ArgumentTypeError as e:
-        print(f"Argument Error - {e}\n")
-        parser.print_help()
-        sys.exit(-1)
+    return parser.parse_args()
 
 ################################################################################
 
 def main():
     """ main function """
-    check_args()
+    args        = check_args()
 
-    nb_cases    = int(sys.argv[1])
-    verbose     = int(sys.argv[2])
+    nb_cases    = args.NB_CASES
+    verbose     = args.VERBOSE
     result      = wheat_grains(nb_cases, verbose)
 
     print("-" * 40)
