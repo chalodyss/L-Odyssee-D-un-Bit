@@ -5,7 +5,6 @@
  */
 
 module morpion {
-    requires transitive javafx.graphics;
     requires javafx.controls;
     requires javafx.fxml;
 
