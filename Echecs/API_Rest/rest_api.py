@@ -12,7 +12,6 @@
 
 import  argparse
 import  re
-import  sys
 import  numpy       as np
 import  pandas      as pd
 import  requests
@@ -109,30 +108,46 @@ def build_df_games(player):
 
 ################################################################################
 
+def check_games(value):
+    """ check_games function """
+    games = int(value)
+
+    if games not in [0, 1]:
+        raise argparse.ArgumentTypeError(f"GAMES must be 0 or 1, got {games}.")
+
+    return games
+
 def check_args():
     """ check_args function """
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("USERNAME", help = "players's username", type = str)
+    parser.add_argument("USERNAME", help = "PLAYER'S USERNAME", type = str)
+    parser.add_argument("GAMES", help = "PLAYER'S GAMES", type = check_games)
     parser.parse_args()
+
+    return parser.parse_args()
 
 ################################################################################
 
 def main():
     """ main function """
-    check_args()
+    args        = check_args()
 
-    player      = sys.argv[1]
+    player      = args.USERNAME
+    games       = args.GAMES
 
     df_stats    = build_df_stats(player)
+
     print(df_stats.head())
     print("-" * 80)
 
-    df_games    = build_df_games(player)
-    print(df_games.head())
-    print("-" * 80)
+    if games == 1:
+        df_games = build_df_games(player)
 
-    df_games.to_csv(f"{player}_games.csv")
+        print(df_games.head())
+        print("-" * 80)
+
+        df_games.to_csv(f"{player}_games.csv")
 
 ################################################################################
 
