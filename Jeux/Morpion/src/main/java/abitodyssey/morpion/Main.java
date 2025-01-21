@@ -14,6 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.CheckBox;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -39,7 +40,7 @@ class Game {
     static int     rDiag;
 
 
-    private Game() { }
+    private Game() {}
 
     static void init(int start) {
         rand    = new Random();
@@ -58,16 +59,121 @@ class Game {
     }
 
     static int o_play() {
-        var cells = new ArrayList<>();
+        var cells = new ArrayList<Integer>();
         var cell  = -1;
 
-        for (var i = 0; i < 9; i++) if (grid[i] == 0) cells.add(i);
-        cell       = (int) cells.get(rand.nextInt(cells.size()));
+        for (var i = 0; i < 9; i++) {
+            if (grid[i] == 0) cells.add(i);
+        }
+
+        if (cells.isEmpty()) {
+            return -1;
+        }
+
+        cell       = cells.get(rand.nextInt(cells.size()));
         grid[cell] = -1;
         move       = 1;
         update(cell, -1);
+        nbMoves--;
 
         return cell;
+    }
+
+    static int o_play_unbeatable() {
+        if (end || nbMoves == 0) return -1;
+
+        int cell = getBestMove();
+
+        if (cell == -1) cell = o_play();
+
+        if (cell == -1) return -1;
+
+        grid[cell] = -1;
+        move       = 1;
+
+        update(cell, -1);
+        nbMoves--;
+
+        return cell;
+    }
+
+    static int getBestMove() {
+        int winMove = findWinningMove(-1);
+        if (winMove != -1) return winMove;
+
+        int blockMove = findWinningMove(1);
+        if (blockMove != -1) return blockMove;
+
+        int forkMove = findForkMove(-1);
+        if (forkMove != -1) return forkMove;
+
+        int blockFork = findForkMove(1);
+        if (blockFork != -1) return blockFork;
+
+        if (grid[4] == 0) return 4;
+
+        int[] corners = {0, 2, 6, 8};
+
+        for (int c : corners) {
+            if (grid[c] == 0) return c;
+        }
+
+        int[] edges = {1, 3, 5, 7};
+
+        for (int e : edges) {
+            if (grid[e] == 0) return e;
+        }
+
+        return -1;
+    }
+
+    static int findWinningMove(int state) {
+        for (int i = 0; i < 9; i++) {
+            if (grid[i] == 0) {
+                simulateMove(i, state);
+
+                if (isAligned()) {
+                    revertMove(i, state);
+                    return i;
+                }
+
+                revertMove(i, state);
+            }
+        }
+
+        return -1;
+    }
+
+    static int findForkMove(int state) {
+        for (int i = 0; i < 9; i++) {
+            if (grid[i] == 0) {
+                simulateMove(i, state);
+                var forks = 0;
+
+                for (int j = 0; j < 9; j++) {
+                    if (grid[j] == 0) {
+                        simulateMove(j, state);
+                        if (isAligned()) forks++;
+                        revertMove(j, state);
+                    }
+                }
+
+                revertMove(i, state);
+                if (forks >= 2) return i;
+            }
+        }
+
+        return -1;
+    }
+
+    static void simulateMove(int cell, int state) {
+        grid[cell] = state;
+        update(cell, state);
+    }
+
+    static void revertMove(int cell, int state) {
+        grid[cell] = 0;
+        update(cell, -state);
     }
 
     static void x_play(int row, int col) {
@@ -97,16 +203,18 @@ class Game {
 
 class Controller {
 
-    Image           cross  = new Image("/cross.png", 240, 240, false, false);
-    Image           circle = new Image("/circle.png", 240, 240, false, false);
+    Image       cross  = new Image("/cross.png", 240, 240, false, false);
+    Image       circle = new Image("/circle.png", 240, 240, false, false);
 
     @FXML
-    Canvas          board;
+    Canvas      board;
+    @FXML
+    CheckBox    cbUnbeatable;
 
-    int             start;
+    int         start;
 
 
-    Controller() { }
+    Controller() {}
 
     @FXML
     void initialize() {
@@ -121,7 +229,7 @@ class Controller {
         Game.init(start);
 
         if (Game.move == 0) {
-            var num = Game.o_play();
+            var num = cbUnbeatable.isSelected() ? Game.o_play_unbeatable() : Game.o_play();
             var x   = num % 3;
             var y   = num / 3;
 
@@ -138,9 +246,10 @@ class Controller {
             drawMove(cross, col, row);
             Game.checkEnd();
             if (!Game.end) {
-                var num = Game.o_play();
+                var num = cbUnbeatable.isSelected() ? Game.o_play_unbeatable() : Game.o_play();
                 var x   = num % 3;
                 var y   = num / 3;
+
                 drawMove(circle, x, y);
                 Game.checkEnd();
             }
@@ -168,13 +277,13 @@ public class Main extends Application {
 
     public void start(Stage stage) {
         try {
-            Controller controller = new Controller();
+            FXMLLoader loader       = new FXMLLoader(getClass().getResource("/views/View.fxml"));
+            Controller controller   = new Controller();
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/View.fxml"));
             loader.setController(controller);
 
-            HBox  root  = loader.load();
-            Scene scene = new Scene(root);
+            HBox  root              = loader.load();
+            Scene scene             = new Scene(root);
 
             stage.setResizable(false);
             stage.setTitle("Morpion");
