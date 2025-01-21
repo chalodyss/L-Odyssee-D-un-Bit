@@ -31,7 +31,6 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 class Disk extends Rectangle {
@@ -65,9 +64,9 @@ class Disk extends Rectangle {
 
     void setxPos(double w) {
         xPos    = new double[3];
-        xPos[0] = 450 - w / 2;
-        xPos[1] = 900 - w / 2;
-        xPos[2] = 1350 - w / 2;
+        xPos[0] = 300 - w / 2;
+        xPos[1] = 600 - w / 2;
+        xPos[2] = 900 - w / 2;
     }
 
 }
@@ -84,15 +83,15 @@ class HanoiTask extends Task<Void> {
 
 
     HanoiTask(int nb) {
-        rods        = Arrays.asList(new CopyOnWriteArrayList<>(),
-                                    new CopyOnWriteArrayList<>(),
-                                    new CopyOnWriteArrayList<>());
-        snapShot    = Arrays.asList(new CopyOnWriteArrayList<>(),
-                                    new CopyOnWriteArrayList<>(),
-                                    new CopyOnWriteArrayList<>());
-        nbDisks     = nb;
-        nbMoves     = new BigInteger("2").pow(nbDisks).subtract(BigInteger.ONE);
-        startTime   = Instant.now();
+        rods      = Arrays.asList(new CopyOnWriteArrayList<>(),
+                                  new CopyOnWriteArrayList<>(),
+                                  new CopyOnWriteArrayList<>());
+        snapShot  = Arrays.asList(new CopyOnWriteArrayList<>(),
+                                  new CopyOnWriteArrayList<>(),
+                                  new CopyOnWriteArrayList<>());
+        nbDisks   = nb;
+        nbMoves   = new BigInteger("2").pow(nbDisks).subtract(BigInteger.ONE);
+        startTime = Instant.now();
     }
 
     void hanoi(int nbDisks, int start, int end, int tmp) {
@@ -111,7 +110,7 @@ class HanoiTask extends Task<Void> {
     void moveDisk(int start, int end) {
         var disk = rods.get(start - 1).removeLast();
 
-        disk.move(disk.xPos[end - 1], 1150 - ((rods.get(end - 1).size() + 1) * disk.getHeight()));
+        disk.move(disk.xPos[end - 1], 750 - ((rods.get(end - 1).size() + 1) * disk.getHeight()));
         rods.get(end - 1).add(disk);
 
         if (Duration.between(startTime, Instant.now()).toMillis() >= 10L) {
@@ -121,14 +120,13 @@ class HanoiTask extends Task<Void> {
     }
 
     void takeSnapShot() {
-        AtomicInteger i = new AtomicInteger();
-
         snapShot.forEach(List::clear);
 
-        rods.forEach(rod -> {
-            for (var disk : rod) snapShot.get(i.get()).add(new Disk(disk));
-            i.getAndIncrement();
-        });
+        for (int i = 0; i < rods.size(); i++) {
+            for (var disk : rods.get(i)) {
+                snapShot.get(i).add(new Disk(disk));
+            }
+        }
     }
 
     @Override
@@ -156,16 +154,16 @@ class Renderer {
 class Controller {
 
     @FXML
-    Pane              board;
+    Pane                board;
     @FXML
-    Text              nbMoves;
+    Text                nbMoves;
     @FXML
-    ComboBox<Integer> disks;
+    ComboBox<Integer>   disks;
 
-    HanoiTask         task;
-    IntegerProperty   nbDisks;
+    HanoiTask           task;
+    IntegerProperty     nbDisks;
 
-    AnimationTimer    timer;
+    AnimationTimer      timer;
 
 
     Controller() {
@@ -180,7 +178,7 @@ class Controller {
 
     @FXML
     void initialize() {
-        var obListDisks = FXCollections.observableList(Arrays.asList(1, 2, 4, 8, 16, 24, 32, 40, 48, 56, 64, 128));
+        var obListDisks = FXCollections.observableList(Arrays.asList(1, 2, 4, 8, 16, 32, 64, 128));
 
         disks.setItems(obListDisks);
         disks.getSelectionModel().select(0);
@@ -200,10 +198,10 @@ class Controller {
             task.cancel();
         }
 
-        var diskW = 300.0;
-        var diskH = nbDisks.get() > 8 ? 768.0 / nbDisks.get() : 512.0 / (nbDisks.get() * (8.0 / nbDisks.get()));
-        var x     = 300.0;
-        var y     = 1150.0 - diskH;
+        var diskW = 200.0;
+        var diskH = nbDisks.get() > 8 ? 512.0 / nbDisks.get() : 256.0 / (nbDisks.get() * (8.0 / nbDisks.get()));
+        var x     = 200.0;
+        var y     = 750.0 - diskH;
 
         task = new HanoiTask(nbDisks.get());
 
@@ -235,14 +233,13 @@ public class Main extends Application {
 
     public void start(Stage stage) {
         try {
-            Controller controller = new Controller();
+            FXMLLoader loader       = new FXMLLoader(getClass().getResource("/views/View.fxml"));
+            Controller controller   = new Controller();
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/View.fxml"));
             loader.setController(controller);
 
-            VBox root = loader.load();
-
-            Scene scene = new Scene(root);
+            VBox  root              = loader.load();
+            Scene scene             = new Scene(root);
 
             stage.setResizable(false);
             stage.setTitle("Hanoi Towers");
