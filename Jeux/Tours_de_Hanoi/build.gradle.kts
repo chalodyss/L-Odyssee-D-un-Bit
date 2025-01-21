@@ -21,12 +21,24 @@ application {
     mainModule  = "hanoitowers"
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
 javafx {
+    version = "21"
     modules("javafx.graphics", "javafx.controls", "javafx.fxml")
 }
 
-tasks.withType<Jar> {
+tasks.named<Delete>("clean") {
+    delete("target")
+}
+
+tasks.named<Jar>("jar") {
     archiveBaseName = "HanoiTowers"
+    destinationDirectory.set(file("target"))
 
     manifest {
         attributes["Main-Class"] = "abitodyssey.hanoitowers.Main"
