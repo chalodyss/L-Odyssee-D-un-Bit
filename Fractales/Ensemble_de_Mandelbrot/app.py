@@ -30,7 +30,7 @@ app.layout  = [ html.Div(id         = "options",
                                         html.Br(),
                                         html.Hr(),
                                         html.H2(children = "Résolution"),
-                                        dcc.Dropdown(id = "dropdown_resolution", options = [ "Low", "High", "Zoom" ], value = "low"),
+                                        dcc.Dropdown(id = "dropdown_resolution", options = [ "Low", "High", "Zoom" ], value = "Low"),
                                         html.Br(),
                                         html.Hr(),
                                         html.H2(children = "Nombre de points"),
@@ -38,11 +38,11 @@ app.layout  = [ html.Div(id         = "options",
                                         html.Br(),
                                         html.Hr(),
                                         html.H2(children = "Nombre d'itérations"),
-                                        dcc.Dropdown(id = "dropdown_iterations", options = [ 2, 4, 8, 16, 32, 64 ], value = 2),
+                                        dcc.Dropdown(id = "dropdown_iterations", options = [ 2, 4, 8, 16, 32, 64 ], value = 16),
                                         html.Br(),
                                         html.Hr(),
                                         html.H2(children = "Délai d'affichage"),
-                                        dcc.Dropdown(id = "dropdown_delay", options = [ 1000, 100, 10 ], value = 1000),
+                                        dcc.Dropdown(id = "dropdown_delay", options = [ 1000, 500, 100, 10 ], value = 500),
                                         html.Br(),
                                         html.Hr(),
                                         html.H2(children = "Limite"),
@@ -50,6 +50,11 @@ app.layout  = [ html.Div(id         = "options",
                                         html.Br(),
                                         html.Br(),
                                         html.Hr(),
+                                        html.H2(children = "Couleurs"),
+                                        dcc.Dropdown(id = "dropdown_colors", options = [ "Binary", "Grayscale" ], value = "Binary"),
+                                        html.Br(),
+                                        html.Hr(),
+                                        html.Br(),
                                         html.Br(),
                                         html.Button(children = "Init", id = "init"),
                                         html.Br(),
@@ -75,6 +80,7 @@ app.layout  = [ html.Div(id         = "options",
                 dcc.Store(id = "iterations"),
                 dcc.Store(id = "delay"),
                 dcc.Store(id = "limit"),
+                dcc.Store(id = "colors"),
                 dcc.Store(id = "figures", data = []),
                 dcc.Store(id = "cpt")
                ]
@@ -86,9 +92,7 @@ app.layout  = [ html.Div(id         = "options",
 
 def update_resolution(value):
     """ update_resolution function """
-    data = value
-
-    return data
+    return value
 
 ################################################################################
 
@@ -97,9 +101,7 @@ def update_resolution(value):
 
 def update_nb_points(value):
     """ update_nb_points function """
-    data = value
-
-    return data
+    return value
 
 ################################################################################
 
@@ -108,9 +110,7 @@ def update_nb_points(value):
 
 def update_iterations(value):
     """ update_iterations function """
-    data = value
-
-    return data
+    return value
 
 ################################################################################
 
@@ -120,9 +120,7 @@ def update_iterations(value):
 
 def update_delay(value):
     """ update_delay function """
-    data = value
-
-    return data, data
+    return value, value
 
 ################################################################################
 
@@ -131,9 +129,18 @@ def update_delay(value):
 
 def update_limit(value):
     """ update_limit function """
-    data = value
+    return value
 
-    return data
+################################################################################
+
+@callback(
+    Output("colors", "data"),
+    Input("dropdown_colors", "value")
+)
+
+def update_colors(value):
+    """ update_colors function """
+    return value
 
 ################################################################################
 
@@ -149,12 +156,13 @@ def update_limit(value):
         State("resolution", "data"),
         State("nb_points", "data"),
         State("iterations", "data"),
-        State("limit", "data")
+        State("limit", "data"),
+        State("colors", "data")
     ],
     prevent_initial_call = True
 )
 
-def init(_, resolution, points, iterations, limit):
+def init(_, resolution, points, iterations, limit, colors):
     """ init function"""
     cpt         = 0
     disabled    = True
@@ -166,61 +174,34 @@ def init(_, resolution, points, iterations, limit):
         mandelbrot.low_compute(iterations)
         mandelbrot.set_low_figures(iterations)
     elif resolution == "High":
-        mandelbrot.high_compute_binary(iterations)
-        mandelbrot.set_high_figures_binary(iterations)
+        mandelbrot.high_compute(iterations, colors)
+        mandelbrot.set_high_figures(iterations, colors)
 
     return mandelbrot.figures[0], disabled, mandelbrot.figures, cpt
 
 ################################################################################
 
-@callback(
+clientside_callback(
+    """
+    function(n_clicks, n_intervals, disabled, iterations, cpt, figures) {
+        if (cpt >= iterations) {
+            return [figures[figures.length - 1], true, n_intervals, iterations];
+        }
+
+        return [figures[cpt], false, n_intervals, cpt + 1];
+    }
+    """,
     Output("graph", "figure"),
     Output("figure_update", "disabled"),
     Output("figure_update", "n_intervals"),
     Output("cpt", "data"),
     Input("draw", "n_clicks"),
     Input("figure_update", "n_intervals"),
+    State("figure_update", "disabled"),
     State("iterations", "data"),
     State("cpt", "data"),
     State("figures", "data"),
-    prevent_initial_call = True
-)
-
-def draw(_, n_intervals, iterations, cpt, figures):
-    """ draw function """
-    if cpt is None:
-        cpt = 0
-
-    cpt += 1
-
-    if cpt > iterations:
-        return figures[cpt - 1], True, 0, cpt - 1
-
-    return figures[cpt], False, n_intervals, cpt
-
-################################################################################
-
-# clientside_callback(
-#     """
-#     function(n_clicks, n_intervals, disabled, iterations, cpt, figures) {
-#         if (cpt >= iterations) {
-#             return [figures[figures.length - 1], true, n_intervals, iterations];
-#         }
-
-#         return [figures[cpt], false, n_intervals, cpt + 1];
-#     }
-#     """,
-#     Output("graph", "figure"),
-#     Output("figure_update", "disabled"),
-#     Output("figure_update", "n_intervals"),
-#     Output("cpt", "data"),
-#     Input("draw", "n_clicks"),
-#     Input("figure_update", "n_intervals"),
-#     State("figure_update", "disabled"),
-#     State("iterations", "data"),
-#     State("cpt", "data"),
-#     State("figures", "data"),
-#     prevent_initial_call = True)
+    prevent_initial_call = True)
 
 ################################################################################
 
