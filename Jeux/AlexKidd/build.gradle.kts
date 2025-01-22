@@ -21,7 +21,14 @@ application {
     mainModule  = "alexkidd"
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
 javafx {
+    version = "21"
     modules("javafx.graphics", "javafx.controls", "javafx.fxml")
 }
 
@@ -30,5 +37,18 @@ sourceSets {
         resources.srcDir("src/main/resources/levels")
         resources.srcDir("src/main/resources/sprites")
         resources.srcDir("src/main/resources/views")
+    }
+}
+
+tasks.named<Delete>("clean") {
+    delete("target")
+}
+
+tasks.named<Jar>("jar") {
+    archiveBaseName = "AlexKidd"
+    destinationDirectory.set(file("target"))
+
+    manifest {
+        attributes["Main-Class"] = "abitodyssey.alexkidd.Main"
     }
 }
