@@ -5,6 +5,7 @@ comme la physique ou la biologie. Les programmer permet de commencer à mieux le
 
 ## Liens vidéo
 
+* [Ensemble de Mandelbrot](https://www.youtube.com/watch?v=8vsnvr3Xq90&t=1s)
 * [Flocon de Von Koch](https://www.youtube.com/watch?v=pRHguA2ZpVg&t=5s)
 * [Triangle de Sierpinski](https://www.youtube.com/watch?v=HR9r4V3fOlY)
 
