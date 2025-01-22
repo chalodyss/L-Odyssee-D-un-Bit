@@ -9,6 +9,7 @@ Il n'y a pas de restrictions sur les langages et les librairies utilisés, donc 
 
 ## Liens vidéo
 
+* [Alex Kidd](https://www.youtube.com/watch?v=dWWN-2wCC0U)
 * [Jeu de la vie](https://www.youtube.com/watch?v=MKafg_0gYNY)
 * [Morpion](https://www.youtube.com/watch?v=PRQbX9-SD8s)
 * [Pendu](https://www.youtube.com/watch?v=cGch4u_QLBA)
