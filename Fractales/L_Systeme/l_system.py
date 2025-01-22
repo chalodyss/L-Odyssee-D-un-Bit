@@ -37,12 +37,17 @@ class LSystem:
             rule = rule.split("=")
             operations.append((rule[0], rule[1]))
 
-        for _ in range(0, iterations):
+        for _ in range(iterations):
             for token in self.result:
-                for rule in operations:
-                    for letter in token:
+                for letter in token:
+                    replaced = False
+                    for rule in operations:
                         if letter == rule[0]:
                             tmp_result.append(rule[1])
+                            replaced = True
+                            break
+                    if not replaced:
+                        tmp_result.append(letter)
             self.result = tmp_result[:]
             tmp_result  = []
             print(self.result)
