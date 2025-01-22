@@ -7,8 +7,6 @@
 package abitodyssey.alexkidd;
 
 
-import static abitodyssey.alexkidd.Collisions.*;
-
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -32,24 +30,28 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+
+import static abitodyssey.alexkidd.Collisions.*;
 
 
 class Images {
 
     static Image GRASS       = new Image("grass.png", 50, 50, true, true);
     static Image WALL        = new Image("wall.png", 50, 50, true, true);
-
+    //
     static Image SHEET       = new Image("sheet.png", 462, 1194, true, true);
     static Image ALEX_WALK_1 = new WritableImage(SHEET.getPixelReader(), 4, 4, 42, 70);
     static Image ALEX_WALK_2 = new WritableImage(SHEET.getPixelReader(), 55, 4, 42, 70);
     static Image ALEX_WALK_3 = new WritableImage(SHEET.getPixelReader(), 106, 4, 42, 70);
-
+    //
     static Image ALEX        = new WritableImage(SHEET.getPixelReader(), 4, 85, 45, 70);
     static Image ALEX_PUNCH  = new WritableImage(SHEET.getPixelReader(), 58, 85, 66, 70);
     static Image ALEX_JUMP   = new WritableImage(SHEET.getPixelReader(), 133, 85, 45, 70);
@@ -62,23 +64,32 @@ class Levels {
     private Levels() {}
 
     static List<Entity> load_level(String file) throws IOException {
+
         List<Entity> level = new ArrayList<>();
-        double       x     = 0;
-        double       y     = 0;
+        var          x     = 0;
+        var          y     = 0;
 
-        try (var bufferedReader = new BufferedReader(new FileReader(file))) {
-            var line = "";
+        try (InputStream is = Levels.class.getClassLoader().getResourceAsStream(file)) {
+            if (is == null) {
+                throw new FileNotFoundException("Resource not found: " + file);
+            }
 
-            while ((line = bufferedReader.readLine()) != null) {
-                for (var j = 0; j < line.length(); j++) {
-                    switch (line.charAt(j)) {
-                        case '1' -> level.add(new Entity(x, y, Images.GRASS));
-                        case '2' -> level.add(new Entity(x, y, Images.WALL));
+            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is))) {
+                String line;
+
+                while ((line = bufferedReader.readLine()) != null) {
+                    for (int j = 0; j < line.length(); j++) {
+                        switch (line.charAt(j)) {
+                            case '1' -> level.add(new Entity(x, y, Images.GRASS));
+                            case '2' -> level.add(new Entity(x, y, Images.WALL));
+                            default -> {
+                            }
+                        }
+                        x += 50;
                     }
-                    x += 50;
+                    x = 0;
+                    y += 50;
                 }
-                x = 0;
-                y += 50;
             }
         }
 
@@ -102,6 +113,7 @@ class Collisions {
             var wall = entities.getFirst();
 
             if (direction == 'v') {
+                player.velY = 0;
                 if (player.getY() < wall.getY()) {
                     player.setY(wall.getY() - 71);
                     player.canJump = true;
@@ -155,7 +167,7 @@ class Player extends AnimatedEntity {
 
     Player(double x, double y, Image img) {
         super(x, y, img);
-        gravity = 0.35f;
+        gravity = 0.4f;
         canJump = true;
         images  = new Image[] { Images.ALEX_WALK_1, Images.ALEX_WALK_2, Images.ALEX_WALK_3,
                                 Images.ALEX_PUNCH, Images.ALEX_JUMP, Images.ALEX_SQUAT };
@@ -164,7 +176,6 @@ class Player extends AnimatedEntity {
     void move(List<Entity> walls) {
         if (velY <= 9.8) {
             velY += gravity;
-            setY(getY() + velY);
         }
 
         setY(getY() + velY);
@@ -176,6 +187,9 @@ class Player extends AnimatedEntity {
 
     @Override
     void update(int n) {
+        if (getX() < 0) setX(0);
+        if (getX() > 2650) setX(2650);
+
         switch (n) {
             case 0 -> {
                 velX  = 0;
@@ -200,7 +214,7 @@ class Player extends AnimatedEntity {
             case 3 -> {
                 if (canJump) {
                     setImage((images[4]));
-                    velY -= 20;
+                    velY -= 15;
                     canJump = false;
                 }
             }
@@ -211,8 +225,8 @@ class Player extends AnimatedEntity {
 
 class Game {
 
-    static BooleanProperty end = new SimpleBooleanProperty(false);
-
+    static BooleanProperty end;
+    //
     static List<Entity>    level;
     static Player          player;
 
@@ -224,7 +238,9 @@ class Game {
     private Game() {}
 
     static void reset() {
-        setLevel();
+        end = new SimpleBooleanProperty(false);
+
+        setLevel(1);
         setPlayer();
     }
 
@@ -252,9 +268,14 @@ class Game {
         player = new Player(50, 750, Images.ALEX);
     }
 
-    static void setLevel() {
+    static void setLevel(int n) {
         try {
-            level = Levels.load_level("src/main/resources/levels/level_1.txt");
+            switch (n) {
+                case 1  -> level = Levels.load_level("level_1.txt");
+                case 2  -> level = Levels.load_level("level_2.txt");
+                default -> {
+                }
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -264,13 +285,13 @@ class Game {
 
 class Controller {
 
-    Pane            board;
-
-    AnimationTimer  loop;
-
-    Set<KeyCode>    activeKeys;
-    boolean         jumpRelease;
-    boolean         pause;
+    Pane           board;
+    //
+    AnimationTimer loop;
+    //
+    Set<KeyCode>   activeKeys;
+    boolean        jumpRelease;
+    boolean        pause;
 
 
     Controller(Pane pane) {
@@ -378,7 +399,7 @@ class Home {
     Text  title;
     VBox  menu;
     int   currentItem;
-
+    //
     App   app;
     Stage stage;
     Scene sceneHome;
@@ -446,6 +467,7 @@ class Home {
         Rectangle bg;
         Text      text;
 
+
         MenuItem(String name) {
             bg = new Rectangle(600, 100);
 
@@ -470,7 +492,7 @@ class App {
     VBox       root;
     HBox       footer;
     Controller controller;
-
+    //
     Stage      stage;
     Scene      sceneApp;
     Home       home;
