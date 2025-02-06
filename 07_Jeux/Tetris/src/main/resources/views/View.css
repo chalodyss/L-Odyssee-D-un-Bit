@@ -1,0 +1,30 @@
+/*
+ * Copyright © 2025 Charles Theetten
+ * Tous droits réservés.
+ * Ce programme est distribué sous licence CC BY-NC-ND 4.0.
+ */
+
+.button {
+    -fx-font-family         : Consolas;
+    -fx-font-size           : 30px;
+    -fx-background-radius   : 15px;
+}
+
+.label {
+    -fx-font-family         : Consolas;
+    -fx-font-size           : 30px;
+}
+
+#score {
+    -fx-font-family         : Consolas;
+    -fx-font-size           : 30px;
+}
+
+#level {
+    -fx-font-family         : Consolas;
+    -fx-font-size           : 30px;
+}
+
+#sideBar {
+    -fx-background-color    : #D6DBDF;
+}
