@@ -1,0 +1,119 @@
+/*
+ * Copyright © 2025 Charles Theetten
+ * Tous droits réservés.
+ * Ce programme est distribué sous licence CC BY-NC-ND 4.0.
+ */
+
+h1 {
+    text-align      : center
+}
+
+h2 {
+    text-align      : center;
+    color           : white;
+}
+
+#options {
+  position          : fixed;
+  left              : 0;
+  top               : 0;
+  display           : inline-block;
+  width             : 10%;
+  height            : 100vh;
+  background-color  : #1b2631;
+  text-align        : center;
+  overflow-y        : auto;
+}
+
+#options h1 {
+  color             : deepskyblue;
+  text-align        : center;
+  padding-top       : 20px;
+  margin            : 0;
+}
+
+.Select-value-label {
+  font-weight       : bold !important;
+  font-size         : 30px !important;
+}
+
+.Select-option {
+  font-weight       : bold !important;
+  font-size         : 20px !important;
+}
+
+#dropdown_resolution {
+  width             : 80%;
+  margin            : auto;
+}
+
+#dropdown_points {
+  width             : 80%;
+  margin            : auto;
+}
+
+#dropdown_iterations {
+  width             : 80%;
+  margin            : auto;
+}
+
+#dropdown_delay {
+  width             : 80%;
+  margin            : auto;
+}
+
+#dropdown_colors {
+  width             : 80%;
+  margin            : auto;
+}
+
+#textbox_limit {
+  width             : 80%;
+  margin            : auto;
+  font-size         : x-large;
+  font-weight       : bold;
+  text-align        : center;
+}
+
+#figure {
+  float             : right;
+  background-color  : rgb(0, 110, 255);
+  width             : 90%;
+  height            : 100vh;
+}
+
+#graph {
+  width             : 100%;
+  height            : 100%;
+}
+
+#init {
+  width             : 80%;
+  font-size         : 30px;
+  background-color  : orange;
+  border            : 1px solid rgba(27, 31, 35, 0.15);
+  border-radius     : 10px;
+}
+
+#init               :hover {
+  background-color  : aqua;
+  border-color      : rgba(0, 0, 0, 0.15);
+  box-shadow        : rgba(0, 0, 0, 0.1) 0 4px 12px;
+  color             : #000000;
+}
+
+#draw {
+    width           : 80%;
+    margin          : auto;
+    font-size       : 30px;
+    background-color: orange;
+    border          : 1px solid rgba(27, 31, 35, 0.15);
+    border-radius   : 10px;
+}
+
+#draw               :hover {
+  background-color  : aqua;
+  border-color      : rgba(0, 0, 0, 0.15);
+  box-shadow        : rgba(0, 0, 0, 0.1) 0 4px 12px;
+  color             : #000000;
+}
