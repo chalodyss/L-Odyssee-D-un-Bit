@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright © 2025 Charles Theetten
+Tous droits réservés.
+Ce programme est distribué sous licence CC BY-NC-ND 4.0.
+ -->
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0"
+      prefWidth="1200.0" stylesheets="@View.css" xmlns="http://javafx.com/javafx/" xmlns:fx="http://javafx.com/fxml/">
+    <GridPane fx:id="header" prefHeight="50.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        </rowConstraints>
+        <Button mnemonicParsing="false" onAction="#solve" prefWidth="200.0" text="SOLVE" GridPane.columnIndex="1"
+                GridPane.halignment="CENTER"/>
+        <ComboBox fx:id="disks" onAction="#reset" prefWidth="200.0" GridPane.halignment="CENTER"/>
+    </GridPane>
+    <Pane fx:id="board" prefHeight="750.0" prefWidth="1200.0">
+        <Line endX="300.0" endY="750.0" startX="300.0" startY="200.0" stroke="#bdc3c7" strokeWidth="11.0"/>
+        <Line endX="600.0" endY="750.0" startX="600.0" startY="200.0" stroke="#bdc3c7" strokeWidth="11.0"/>
+        <Line endX="900.0" endY="750.0" startX="900.0" startY="200.0" stroke="#bdc3c7" strokeWidth="11.0"/>
+        <Text fx:id="nbMoves" fill="#0dff00" strokeType="OUTSIDE" strokeWidth="0.0" text="-------" x="50.0" y="75.0">
+            <font>
+                <Font name="System Bold" size="48.0"/>
+            </font>
+        </Text>
+    </Pane>
+</VBox>
